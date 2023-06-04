@@ -2,6 +2,8 @@ package peaksoft.api;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import peaksoft.dto.InstructorRequest;
+import peaksoft.dto.InstructorResponse;
 import peaksoft.entity.Instructor;
 import peaksoft.service.InstructorService;
 
@@ -14,20 +16,20 @@ public class InstructorApi {
     private final InstructorService instructorService;
 
     @GetMapping
-    public List<Instructor> getAllInstructors(){
+    public List<InstructorResponse> getAllInstructors(){
         return instructorService.getAllInstructors();
     }
 
     @PostMapping
-    public Instructor saveInstructor(@RequestBody Instructor instructor){
-        return instructorService.saveInstructor(instructor);
+    public InstructorResponse saveInstructor(@RequestBody InstructorRequest instructorRequest){
+        return instructorService.saveInstructor(instructorRequest);
     }
     @GetMapping("/{id}")
-    public Instructor getInstructorById(@PathVariable Long id){
+    public InstructorResponse getInstructorById(@PathVariable Long id){
         return instructorService.getInstructorById(id);
     }
     @PutMapping("/{id}")
-    public Instructor updateInstructor(@PathVariable Long id,@RequestBody Instructor instructor){
+    public InstructorResponse updateInstructor(@PathVariable Long id,@RequestBody InstructorRequest instructor){
         return instructorService.updateGInstructor(id, instructor);
     }
     @DeleteMapping("/{id}")

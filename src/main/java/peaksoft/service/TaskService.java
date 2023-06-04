@@ -1,14 +1,14 @@
 package peaksoft.service;
 
-import peaksoft.entity.Task;
-
+import peaksoft.dto.TaskRequest;
+import peaksoft.dto.TaskResponse;
 import java.util.List;
 
 public interface TaskService {
-    Task saveTask(Task task);
-    List<Task> getAllTasks();
-    Task getTaskById(Long id);
-    Task updateTask(Long id,Task task);
+    TaskResponse saveTask(Long lessonId, TaskRequest taskRequest);
+    List<TaskResponse> getAllTasks();
+    TaskResponse getTaskById(Long id);
+    TaskResponse updateTask(Long id,TaskRequest taskRequest);
     String deleteTask(Long id);
     void taskForLesson(Long taskId,Long lessonId);
 }

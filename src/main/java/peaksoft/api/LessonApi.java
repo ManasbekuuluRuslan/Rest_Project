@@ -1,9 +1,9 @@
 package peaksoft.api;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import peaksoft.dto.LessonRequest;
+import peaksoft.dto.LessonResponse;
 import peaksoft.entity.Lesson;
 import peaksoft.service.LessonService;
 
@@ -16,26 +16,21 @@ public class LessonApi {
     private final LessonService lessonService;
 
     @GetMapping
-    public List<Lesson> getAllLessons(){
+    public List<LessonResponse> getAllLessons(){
         return lessonService.getAllLessons();
     }
-    @PostMapping("/{courseId}")
-    public Lesson createLesson(@PathVariable Long courseId,
-                                               @RequestBody Lesson lesson) {
-        return lessonService.createLesson(lesson, courseId);
-    }
 
-    @PostMapping
-    public Lesson saveLesson(@RequestBody Lesson lesson){
-        return lessonService.saveLesson(lesson);
+    @PostMapping("/save/{courseId}")
+    public LessonResponse saveLessons(@PathVariable Long courseId, @RequestBody LessonRequest lessonRequest) {
+        return lessonService.saveLesson(lessonRequest,courseId);
     }
     @GetMapping("/{id}")
-    public Lesson getLessonById(@PathVariable Long id){
+    public LessonResponse getLessonById(@PathVariable Long id){
         return lessonService.getLessonById(id);
     }
     @PutMapping("/{id}")
-    public Lesson updateLesson(@PathVariable Long id,@RequestBody Lesson lesson){
-        return lessonService.updateLesson(id, lesson);
+    public LessonResponse updateLesson(@PathVariable Long id,@RequestBody LessonRequest lesson){
+        return lessonService.updateLesson(lesson,id);
     }
     @DeleteMapping("/{id}")
     public String deleteLesson(@PathVariable Long id ){

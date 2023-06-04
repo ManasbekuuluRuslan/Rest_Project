@@ -3,6 +3,8 @@ package peaksoft.service.serviceImpl;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import peaksoft.dto.TaskRequest;
+import peaksoft.dto.TaskResponse;
 import peaksoft.entity.Lesson;
 import peaksoft.entity.Task;
 import peaksoft.repository.LessonRepository;
@@ -17,32 +19,49 @@ public class TaskServiceImpl implements TaskService {
     private final TaskRepository taskRepository;
     private final LessonRepository lessonRepository;
     @Override
-    public Task saveTask(Task task) {
-        return taskRepository.save(task);
+    public TaskResponse saveTask(Long lessonId, TaskRequest taskRequest) {
+        Lesson lesson = lessonRepository.findLessonById(lessonId).orElseThrow(()
+                        -> new NullPointerException("Lesson with id " + lessonId + "  is not found "));
+        Task task = new Task();
+        task.setTaskName(taskRequest.getTaskName());
+        task.setTaskText(taskRequest.getTaskText());
+        taskRepository.save(task);
+        lesson.getTaskList().add(task);
+        lessonRepository.save(lesson);
+        return new TaskResponse(
+                task.getId(),
+                task.getTaskName(),
+                task.getTaskText());
     }
     @Override
-    public List<Task> getAllTasks() {
-        return taskRepository.findAll();
+    public List<TaskResponse> getAllTasks() {
+        return taskRepository.getAllTasks();
     }
 
     @Override
-    public Task getTaskById(Long id) {
-        return taskRepository.findById(id).
-                orElseThrow(() -> new NullPointerException
-                        ("Task with id: " + id + " is not found!"));
+    public TaskResponse getTaskById(Long id) {
+        Task task = new Task();
+        taskRepository.findTaskById(id).orElseThrow(() ->
+                new NullPointerException("Task with id " + id + "  is not found "));
+        return new TaskResponse(
+                task.getId(),
+                task.getTaskName(),
+                task.getTaskText());
     }
 
     @Override
-    public Task updateTask(Long id, Task task) {
-        Task task1 = taskRepository.findById(id).
-                orElseThrow(() -> new NullPointerException
-                        ("Task with id: " + id + " is not found!"));
-       task1.setTaskName(task.getTaskName());
-       task1.setTaskText(task.getTaskText());
-       task1.setDeadLine(task.getDeadLine());
-        taskRepository.save(task1);
-        return task1;
+    public TaskResponse updateTask(Long id, TaskRequest taskRequest) {
+        Task task = taskRepository.findTaskById(id).orElseThrow(() ->
+                new NullPointerException("Task with id " + id + "  is not found "));
+        task.setTaskName(taskRequest.getTaskName());
+        task.setTaskText(taskRequest.getTaskText());
+        taskRepository.save(task);
+        return new TaskResponse(
+                task.getId(),
+                task.getTaskName(),
+                task.getTaskText());
     }
+
     @Override
     public String deleteTask(Long id) {
         if (taskRepository.existsById(id)) {

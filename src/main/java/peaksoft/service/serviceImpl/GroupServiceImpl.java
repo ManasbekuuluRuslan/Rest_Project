@@ -4,6 +4,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
+import peaksoft.dto.GroupRequest;
+import peaksoft.dto.GroupResponse;
 import peaksoft.entity.Course;
 import peaksoft.entity.Group;
 import peaksoft.repository.CourseRepository;
@@ -17,34 +19,49 @@ import java.util.List;
 public class GroupServiceImpl implements GroupService {
     private final GroupRepository groupRepository;
     private final CourseRepository courseRepository;
+
     @Override
-    public Group saveGroup(Group group) {
-        return groupRepository.save(group);
+    public GroupResponse saveGroup(Long courseId, GroupRequest groupRequest) {
+        Group group = new Group();
+        group.setGroupName(groupRequest.getGroupName());
+        group.setDescription(groupRequest.getDescription());
+        group.setImageLink(groupRequest.getImageLink());
+        groupRepository.save(group);
+        return new GroupResponse(group.getId(),
+                group.getGroupName(),
+                group.getImageLink(),
+                group.getDescription());
     }
     @Override
-    public List<Group> getAllGroups() {
-        return groupRepository.findAll();
+    public List<GroupResponse> getAllGroups() {
+        return groupRepository.getAllGroup();
     }
 
     @Override
-    public Group getGroupById(Long id) {
-        return groupRepository.findById(id).
-                orElseThrow(() -> new NullPointerException
-                        ("Group with id: " + id + " is not found!"));
+    public GroupResponse getGroupById(Long id) {
+        Group group =
+                groupRepository.findGroupById(id).orElseThrow(()
+                        -> new NullPointerException("Group with id: " + id + " not found "));
+        return new GroupResponse(
+                group.getId(),
+                group.getGroupName(),
+                group.getImageLink(),
+                group.getDescription());
     }
 
     @Override
-    public Group updateGroup(Long id, Group group) {
-        Group group1 = groupRepository.findById(id).
-                orElseThrow(() -> new NullPointerException
-                        ("Group with id: " + id + " is not found!"));
-        group1.setGroupName(group.getGroupName());
-        group1.setDescription(group.getDescription());
-        group1.setImageLink(group.getImageLink());
-        groupRepository.save(group1);
-        return group1;
+    public GroupResponse updateGroup(Long id, GroupRequest groupRequest) {
+        Group group = groupRepository.findGroupById(id).orElseThrow(()
+                        -> new NullPointerException("Group with id: " + id + "  not found "));
+        group.setGroupName(groupRequest.getGroupName());
+        group.setDescription(groupRequest.getDescription());
+        group.setImageLink(groupRequest.getImageLink());
+        groupRepository.save(group);
+        return new GroupResponse(group.getId(),
+                group.getGroupName(),
+                group.getImageLink(),
+                group.getDescription());
     }
-
     @Override
     public String deleteGroup(Long id) {
         if (groupRepository.existsById(id)) {
@@ -52,13 +69,6 @@ public class GroupServiceImpl implements GroupService {
             return "Group with: " + id + "successfully deleted!";
         }
         else throw new NullPointerException("Group with id: " + id + " is not found");
-    }
-
-    @Override
-    public Group createGroup(Group group, List<Long> courseIds) {
-        List<Course> courses = courseRepository.findAllById(courseIds);
-        group.setCourseList(courses);
-        return groupRepository.save(group);
     }
 
     @Override

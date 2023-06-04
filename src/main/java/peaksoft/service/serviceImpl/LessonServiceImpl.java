@@ -3,6 +3,8 @@ package peaksoft.service.serviceImpl;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import peaksoft.dto.LessonRequest;
+import peaksoft.dto.LessonResponse;
 import peaksoft.entity.Course;
 import peaksoft.entity.Lesson;
 import peaksoft.repository.CourseRepository;
@@ -16,47 +18,50 @@ import java.util.List;
 public class LessonServiceImpl implements LessonService {
     private final LessonRepository lessonRepository;
     private final CourseRepository courseRepository;
-    @Override
-    public Lesson saveLesson(Lesson lesson) {
-        return lessonRepository.save(lesson);
-    }
 
     @Override
-    public Lesson createLesson(Lesson lesson, Long courseId) {
-        Course course = courseRepository.findById(courseId)
-                .orElseThrow(() -> new NullPointerException("Course not found with id: " + courseId));
+    public LessonResponse saveLesson(LessonRequest lessonRequest,Long courseId) {
+        Course course = courseRepository.findCourseById(courseId).orElseThrow(()
+                        -> new NullPointerException("Course with id: " + courseId + " not found "));
+        Lesson lesson = new Lesson();
+        lesson.setLessonName(lessonRequest.getLessonName());
+        lessonRepository.save(lesson);
+        course.getLessonList().add(lesson);
         lesson.setCourse(course);
-        return lessonRepository.save(lesson);
+        courseRepository.save(course);
+        return new LessonResponse(lesson.getId(),
+                lesson.getLessonName());
     }
 
     @Override
-    public List<Lesson> getAllLessons() {
-        return lessonRepository.findAll();
+    public List<LessonResponse> getAllLessons() {
+        return lessonRepository.getAllLessons();
     }
 
     @Override
-    public Lesson getLessonById(Long id) {
-        return lessonRepository.findById(id).
-                orElseThrow(() -> new NullPointerException
-                        ("Lesson with id: " + id + " is not found!"));
+    public LessonResponse getLessonById(Long id) {
+        Lesson lesson = new Lesson();
+        lessonRepository.findLessonById(id).orElseThrow(()
+                -> new NullPointerException("Lesson with id: " + id + " not found"));
+        return new LessonResponse(lesson.getId(),
+                lesson.getLessonName());
     }
-
     @Override
-    public Lesson updateLesson(Long id, Lesson lesson) {
-        Lesson lesson1 = lessonRepository.findById(id).
-                orElseThrow(() -> new NullPointerException
-                        ("Lesson with id: " + id + " is not found!"));
-        lesson1.setLessonName(lesson.getLessonName());
-        lessonRepository.save(lesson1);
-        return lesson1;
+    public LessonResponse updateLesson(LessonRequest lessonRequest,Long id) {
+        Lesson lesson = lessonRepository.findLessonById(id).orElseThrow(()
+                        -> new NullPointerException("Lesson with id " + id + " not found "));
+        lesson.setLessonName(lessonRequest.getLessonName());
+        lessonRepository.save(lesson);
+        return new LessonResponse(
+                lesson.getId(),
+                lesson.getLessonName());
     }
-
     @Override
     public String deleteLesson(Long id) {
         if (lessonRepository.existsById(id)) {
             lessonRepository.deleteById(id);
             return "Lesson with: " + id + "successfully deleted!";
         }
-        else throw new NullPointerException("Lesson with id: " + id + " is not found");
+        else throw new NullPointerException("Lesson with id: " + id + " not found");
     }
 }

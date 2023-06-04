@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
+
 @Entity
 @Table(name = "tasks")
 @Setter
@@ -17,12 +19,12 @@ public class Task {
     private Long id;
     private String taskName;
     private String taskText;
-    private String deadLine;
+    private LocalDate deadLine;
     @ManyToOne(cascade = {CascadeType.MERGE,CascadeType.REFRESH,CascadeType.DETACH})
     private Lesson lesson;
 
 
-    public Task(String taskName, String taskText, String deadLine) {
+    public Task(String taskName, String taskText, LocalDate deadLine) {
         this.taskName = taskName;
         this.taskText = taskText;
         this.deadLine = deadLine;

@@ -2,6 +2,8 @@ package peaksoft.api;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import peaksoft.dto.TaskRequest;
+import peaksoft.dto.TaskResponse;
 import peaksoft.entity.Task;
 import peaksoft.service.TaskService;
 
@@ -14,20 +16,20 @@ public class TaskApi {
     private final TaskService taskService;
 
     @GetMapping
-    public List<Task> getAllTasks(){
+    public List<TaskResponse> getAllTasks(){
         return taskService.getAllTasks();
     }
 
-    @PostMapping
-    public Task saveTask(@RequestBody Task task){
-        return taskService.saveTask(task);
+    @PostMapping("/save/{lessonId}")
+    public TaskResponse saveTasks(@PathVariable Long lessonId, @RequestBody TaskRequest taskRequest) {
+        return taskService.saveTask(lessonId,taskRequest);
     }
     @GetMapping("/{id}")
-    public Task getTaskById(@PathVariable Long id){
+    public TaskResponse getTaskById(@PathVariable Long id){
         return taskService.getTaskById(id);
     }
     @PutMapping("/{id}")
-    public Task updateTask(@PathVariable Long id,@RequestBody Task task){
+    public TaskResponse updateTask(@PathVariable Long id,@RequestBody TaskRequest task){
         return taskService.updateTask(id, task);
     }
     @DeleteMapping("/{id}")

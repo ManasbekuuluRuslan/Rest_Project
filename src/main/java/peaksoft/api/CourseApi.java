@@ -3,7 +3,8 @@ package peaksoft.api;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import peaksoft.entity.Course;
+import peaksoft.dto.CourseRequest;
+import peaksoft.dto.CourseResponse;
 import peaksoft.service.CourseService;
 
 import java.util.List;
@@ -15,20 +16,21 @@ public class CourseApi {
     private final CourseService courseService;
 
     @GetMapping
-    public List<Course> getAllCourses(){
+    public List<CourseResponse> getAllCourses(){
         return courseService.getAllCourses();
     }
-
-    @PostMapping
-    public Course saveCourse(@RequestBody Course course){
-        return courseService.saveCourse(course);
+    @PostMapping("/save/{id}/{instructorId}")
+    public CourseResponse saveCourses(@RequestBody CourseRequest courseRequest,
+                                      @PathVariable Long id,
+                                      @PathVariable Long instructorId) {
+        return courseService.saveCourse(courseRequest,id,instructorId);
     }
     @GetMapping("/{id}")
-    public Course getCourseById(@PathVariable Long id){
+    public CourseResponse getCourseById(@PathVariable Long id){
         return courseService.getCourseById(id);
     }
     @PutMapping("/{id}")
-    public Course updateCourse(@PathVariable Long id,@RequestBody Course course){
+    public CourseResponse updateCourse(@PathVariable Long id,@RequestBody CourseRequest course){
         return courseService.updateCourse(id, course);
     }
     @DeleteMapping("/{id}")
